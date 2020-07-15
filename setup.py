@@ -24,25 +24,15 @@ def is_new_osx():
         return False
 
 
-PACKAGE_DATA = {'': ['*.pyx', '*.pxd'],
-                '': ['*.h'],}
-
-
+PACKAGE_DATA = {'': ['*.pyx', '*.pxd']}
 PACKAGES = find_packages()
-
-
 MOD_NAMES = ['neuralcoref.neuralcoref']
-
-
-
 COMPILE_OPTIONS = {
     "other": ["-O2", "-Wno-strict-prototypes", "-Wno-unused-function"],
 }
 
 
-LINK_OPTIONS = {"msvc": [], "mingw32": [], "other": []}
-
-
+LINK_OPTIONS = {"other": []}
 if is_new_osx():
     # On Mac, use libc++ because Apple deprecated use of
     # libstdc
