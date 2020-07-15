@@ -36,8 +36,6 @@ MOD_NAMES = ['neuralcoref.neuralcoref']
 
 
 COMPILE_OPTIONS = {
-    "msvc": ["/Ox", "/EHsc"],
-    "mingw32": ["-O2", "-Wno-strict-prototypes", "-Wno-unused-function"],
     "other": ["-O2", "-Wno-strict-prototypes", "-Wno-unused-function"],
 }
 
@@ -53,22 +51,6 @@ if is_new_osx():
     # g++ (used by unix compiler on mac) links to libstdc++ as a default lib.
     # See: https://stackoverflow.com/questions/1653047/avoid-linking-to-libstdc
     LINK_OPTIONS["other"].append("-nodefaultlibs")
-
-
-USE_OPENMP_DEFAULT = "0" if sys.platform != "darwin" else None
-if os.environ.get("USE_OPENMP", USE_OPENMP_DEFAULT) == "1":
-    if sys.platform == "darwin":
-        COMPILE_OPTIONS["other"].append("-fopenmp")
-        LINK_OPTIONS["other"].append("-fopenmp")
-        PACKAGE_DATA["spacy.platform.darwin.lib"] = ["*.dylib"]
-        PACKAGES.append("spacy.platform.darwin.lib")
-
-    elif sys.platform == "win32":
-        COMPILE_OPTIONS["msvc"].append("/openmp")
-
-    else:
-        COMPILE_OPTIONS["other"].append("-fopenmp")
-        LINK_OPTIONS["other"].append("-fopenmp")
 
 
 # By subclassing build_extensions we have the actual compiler that will be used which is really known only after finalize_options
@@ -118,21 +100,10 @@ def setup_package():
 
         generate_cython(root, 'neuralcoref')
 
-        include_dirs = [
-            get_python_inc(plat_specific=True),
-            os.path.join(root, 'include')]
-
-        if (ccompiler.new_compiler().compiler_type == 'msvc'
-            and msvccompiler.get_build_version() == 9):
-            include_dirs.append(os.path.join(root, 'include', 'msvc9'))
-
         ext_modules = []
         for mod_name in MOD_NAMES:
             mod_path = mod_name.replace('.', '/') + '.cpp'
             extra_link_args = []
-            # ???
-            # Imported from patch from @mikepb
-            # See Issue #267. Running blind here...
             if sys.platform == 'darwin':
                 dylib_path = ['..' for _ in range(mod_name.count('.'))]
                 dylib_path = '/'.join(dylib_path)
@@ -140,7 +111,7 @@ def setup_package():
                 extra_link_args.append('-Wl,-rpath,%s' % dylib_path)
             ext_modules.append(
                 Extension(mod_name, [mod_path],
-                    language='c++', include_dirs=include_dirs,
+                    language='c++', include_dirs=[get_python_inc(plat_specific=True)],
                     extra_link_args=extra_link_args))
 
         setup(name='neuralcoref',
