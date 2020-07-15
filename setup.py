@@ -24,8 +24,6 @@ def is_new_osx():
         return False
 
 
-PACKAGE_DATA = {'': ['*.pyx', '*.pxd']}
-PACKAGES = find_packages()
 MOD_NAMES = ['neuralcoref.neuralcoref']
 COMPILE_OPTIONS = {
     "other": ["-O2", "-Wno-strict-prototypes", "-Wno-unused-function"],
@@ -133,8 +131,8 @@ def setup_package():
                 "spacy>=2.1.0"],
             setup_requires=['wheel', 'spacy>=2.1.0'],
             python_requires=">=3.6",
-            packages=PACKAGES,
-            package_data=PACKAGE_DATA,
+            packages=find_packages(),
+            package_data={'': ['*.pyx', '*.pxd']},
             keywords='NLP chatbots coreference resolution',
             license='MIT',
             zip_safe=False,
