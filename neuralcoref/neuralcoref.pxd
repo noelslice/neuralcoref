@@ -1,3 +1,4 @@
+#cython: language_level=3
 from spacy.tokens.doc cimport Doc
 from spacy.tokens.span cimport Span
 from spacy.typedefs cimport flags_t, attr_t, hash_t
